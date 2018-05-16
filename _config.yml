@@ -1,0 +1,20 @@
+# Site settings
+title:              Portfolio Template
+email:              ablarry91@gmail.com
+description:        "Portfolio template for students in the MSR program at Northwestern University"
+url:                "http://localhost:4000"
+# baseurl:            /main
+baseurl:
+
+# File structure settings
+image_path:         /public/images
+
+# Build settings
+markdown:           kramdown
+permalink:          pretty
+
+# Collection definitions and settings
+collections:
+  projects:
+    output: true
+    permalink: /projects/:path/

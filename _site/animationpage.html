@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="authoring-tool" content="Adobe_Animate_CC">
+<title>My Audio for Videogame</title>
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Favicons
+    ================================================== -->
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
+
+<!-- Stylesheet
+    ================================================== -->
+<link rel="stylesheet" type="text/css"  href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/nivo-lightbox/nivo-lightbox.css">
+<link rel="stylesheet" type="text/css" href="css/nivo-lightbox/default.css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
+
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+    <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script src="BUENISIMOphoto_HTML5 Canvas.js"></script>
+<script>
+var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+function init() {
+	canvas = document.getElementById("canvas");
+	anim_container = document.getElementById("animation_container");
+	dom_overlay_container = document.getElementById("dom_overlay_container");
+	var comp=AdobeAn.getComposition("D611A8F768105A4BADE3B94B7B4ECF05");
+	var lib=comp.getLibrary();
+	var loader = new createjs.LoadQueue(false);
+	loader.installPlugin(createjs.Sound);
+	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
+	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
+	var lib=comp.getLibrary();
+	loader.loadManifest(lib.properties.manifest);
+}
+function handleFileLoad(evt, comp) {
+	var images=comp.getImages();	
+	if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }	
+}
+function handleComplete(evt,comp) {
+	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+	var lib=comp.getLibrary();
+	var ss=comp.getSpriteSheet();
+	var queue = evt.target;
+	var ssMetadata = lib.ssMetadata;
+	for(i=0; i<ssMetadata.length; i++) {
+		ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
+	}
+	exportRoot = new lib.BUENISIMOphoto_HTML5Canvas();
+	stage = new lib.Stage(canvas);
+	stage.enableMouseOver();	
+	//Registers the "tick" event listener.
+	fnStartAnimation = function() {
+		stage.addChild(exportRoot);
+		createjs.Ticker.setFPS(lib.properties.fps);
+		createjs.Ticker.addEventListener("tick", stage);
+	}	    
+	//Code to support hidpi screens and responsive scaling.
+	function makeResponsive(isResp, respDim, isScale, scaleType) {		
+		var lastW, lastH, lastS=1;		
+		window.addEventListener('resize', resizeCanvas);		
+		resizeCanvas();		
+		function resizeCanvas() {			
+			var w = lib.properties.width, h = lib.properties.height;			
+			var iw = window.innerWidth, ih=window.innerHeight;			
+			var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;			
+			if(isResp) {                
+				if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {                    
+					sRatio = lastS;                
+				}				
+				else if(!isScale) {					
+					if(iw<w || ih<h)						
+						sRatio = Math.min(xRatio, yRatio);				
+				}				
+				else if(scaleType==1) {					
+					sRatio = Math.min(xRatio, yRatio);				
+				}				
+				else if(scaleType==2) {					
+					sRatio = Math.max(xRatio, yRatio);				
+				}			
+			}			
+			canvas.width = w*pRatio*sRatio;			
+			canvas.height = h*pRatio*sRatio;
+			canvas.style.width = dom_overlay_container.style.width = anim_container.style.width =  w*sRatio+'px';				
+			canvas.style.height = anim_container.style.height = dom_overlay_container.style.height = h*sRatio+'px';
+			stage.scaleX = pRatio*sRatio;			
+			stage.scaleY = pRatio*sRatio;			
+			lastW = iw; lastH = ih; lastS = sRatio;            
+			stage.tickOnUpdate = false;            
+			stage.update();            
+			stage.tickOnUpdate = true;		
+		}
+	}
+	makeResponsive(false,'both',false,1);	
+	AdobeAn.compositionLoaded(lib.properties.id);
+	fnStartAnimation();
+}
+function playSound(id, loop) {
+	return createjs.Sound.play(id, createjs.Sound.INTERRUPT_EARLY, 0, 0, loop);
+}
+</script>
+</head>
+<body   onload="init();" background="archives/lago.jpg">
+<!-- Navigation
+    ==========================================-->
+
+
+         
+            <div class="container" align="center" style="color:black;">
+             <div id="animation_container" style="background-color:rgba(51, 51, 51, 1.00); width:900px; height:720px">
+		<canvas id="canvas" width="900" height="720" style="position: absolute; display: block; background-color:rgba(51, 51, 51, 1.00);"></canvas>
+		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:800px; height:620px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+              
+             
+              </div>
+              <div style="color:black;margin-left:20%">
+               <a href="archives/BUENISIMOphoto.fla" download="animationjoaquin.fla"  style="color:black;margin-bottom:50%;position: relative">
+			<input style="position: relative;bottom:50%" type="button" value="Download Animation.fla">
+			</a>
+			<a href="archives/BUENISIMOphoto_HTML5 Canvas.html" download="animationjoaquin_clickoninternet"  style="color:black;margin-bottom:50%;position: relative">
+			<input style="position: relative;bottom:50%" type="button" value="Download Animation.html">
+			</a>
+			<a href="archives/BUENISIMOphoto_HTML5 Canvas.js" download="animationjoaquin"  style="color:black;margin-bottom:50%;position: relative">
+			<input style="position: relative;bottom:50%" type="button" value="Download Animation.js">
+			</a>
+			<a href="animation/animation.rar" download="animationarchives.rar"  style="color:black;margin-bottom:50%;position: relative">
+			<input style="position: relative;bottom:50%" type="button" value="Download Animation">
+			</a>
+			<input type="button" onclick="history.back()" name="volver atrás" value="volver atrás">
+          </div>
+          <div class="intro2">
+          <p>This is the Final Animation Project of Joaquin Atienza, the animation represent a city on the Chrismasts period, the are building that reproduce different song when windows are touch, a bicicle moving when touch, and the sun that when touch it's convert to a sunflower, each petal is a Key of a piano, the button of the middle are the intructions.
+        	<br>-This animation was all done in the program adobe Animated CC 2017, this program was new to me so I did some previus research on how to use it, again the tool I use for learning where the Lynda tutorials, I especialy recomend
+         <a style="color:black;" href="https://www.lynda.com/Animate-tutorials/Learn-Adobe-Animate-CC-Basics/482046-2.html?srchtrk=index%3a1%0alinktypeid%3a2%0aq%3aadobe+animated+cc%0apage%3a1%0as%3arelevance%0asa%3atrue%0aproducttypeid%3a2" ><b>this channel.</b></a>
+          <br><br>At first it was really dificult for me to use this program, so I though aboout doing something easy but with hopefully no error, I decided to create a piano, but since the normal piano is boring I did a sunflower Piano where if you touch the middle the sunflower moves.         
+         <br>This was the proyect I submit for last semester.
+          <br>
+          </p>
+          <img src="archives/proyecto1.png"  download="interior1.png" alt="interio1 joaquin" width="600" height="400">
+          <p>
+           <br>After my marks came I realize I needed more work to be done so I decide to create a hole different animation, a city when Christmast is comming, I Decided to draw it at night, when the fireworks and Santa come.
+           <br>I also though that my work didn´t need to be thrown away so I use the sunflower piano as the sun/moon of this animation.
+           <br>In this animation I make three building with their respective windows and garage, in every window/garage if you prease it their tipica christmast theme will sound, like HO,ho,ho,,
+           <br>In all the building there is a roof with a chimney, if the chimney is touch fireworks are thrown to the sky.
+           <br>There is also a bicicle that when touch it make a move and the bells (also very tipical from Christmast ) starts ringing.
+           <br>This is how in my mind a Christmast City should look like
+        	
+        	<br><br>This is my Animation, I hope you enjoy it.
+       	</div>
+        
+     
+        
+
+
+<script type="text/javascript" src="js/jquery.1.11.1.js"></script> 
+<script type="text/javascript" src="js/bootstrap.js"></script> 
+<script type="text/javascript" src="js/SmoothScroll.js"></script> 
+<script type="text/javascript" src="js/nivo-lightbox.js"></script> 
+<script type="text/javascript" src="js/jquery.isotope.js"></script> 
+<script type="text/javascript" src="js/jqBootstrapValidation.js"></script> 
+<script type="text/javascript" src="js/contact_me.js"></script> 
+<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
