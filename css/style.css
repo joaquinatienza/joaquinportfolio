@@ -166,17 +166,23 @@ hr {
 	-o-background-size: cover;
 }
 .intro2 {
-	display: table;
+	display: block;
 	width: 85%;
+	border: 3px solid #000;
+	
+	 margin: auto;
 	padding: 0;
 	margin-left:8%;
 	text-align: center;
+	 text-style:underline;
 	font-size:14px;
-	background-color: #e5e5e5;
+	background-color: #ffffff;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	background-size: cover;
 	-o-background-size: cover;
+	   font-family: times, Times New Roman, times-roman, georgia, serif; line-height: 20px;
+ text-transform: uppercase;
 }
 .section-title.center {
 	padding: 10px 0 40px 0;
